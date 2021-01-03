@@ -70,26 +70,9 @@ impl std::fmt::Display for GameData {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut first = true;
 
-        if let Some(main_story) = &self.main_story {
-            first = false;
-            format_time(f, "Main Story", main_story)?;
-        }
-
-        if let Some(main_plus_extra) = &self.main_plus_extra {
-            if !first {
-                write!(f, ", ")?;
-            }
-            first = false;
-            format_time(f, "Main + Extra", &main_plus_extra)?;
-        }
-
-        if let Some(completionist) = &self.completionist {
-            if !first {
-                write!(f, ", ")?;
-            }
-            first = false;
-            format_time(f, "Completionist", &completionist)?;
-        }
+        format_time(f, "Main Story", &self.main_story, &mut first)?;
+        format_time(f, "Main + Extra", &self.main_plus_extra, &mut first)?;
+        format_time(f, "Completionist", &self.completionist, &mut first)?;
 
         if first {
             write!(f, "None found")?;
@@ -99,6 +82,21 @@ impl std::fmt::Display for GameData {
     }
 }
 
-fn format_time(f: &mut std::fmt::Formatter<'_>, name: impl AsRef<str>, time: &impl Display) -> std::fmt::Result {
-    write!(f, "{} - {} hours", name.as_ref(), time)
+fn format_time(
+    f: &mut std::fmt::Formatter<'_>,
+    name: impl AsRef<str>,
+    opt: &Option<impl Display>,
+    first: &mut bool,
+) -> std::fmt::Result {
+    if let Some(time) = opt {
+        write!(
+            f,
+            "{}{} - {} hours",
+            if !*first { ", " } else { "" },
+            name.as_ref(),
+            time
+        )?;
+        *first = false;
+    }
+    Ok(())
 }
