@@ -2,7 +2,7 @@ use super::{Error, Result};
 use serde::Deserialize;
 use std::fmt::Display;
 
-const BASE_URL: once_cell::sync::Lazy<reqwest::Url> =
+static BASE_URL: once_cell::sync::Lazy<reqwest::Url> =
     once_cell::sync::Lazy::new(|| reqwest::Url::parse("https://api.opencritic.com/api/").unwrap());
 
 #[derive(Debug, Deserialize)]

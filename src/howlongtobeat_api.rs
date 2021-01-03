@@ -1,8 +1,7 @@
+use super::{Error, Result};
 use std::fmt::Display;
 
-use super::{Error, Result};
-
-const BASE_URL: once_cell::sync::Lazy<reqwest::Url> =
+static BASE_URL: once_cell::sync::Lazy<reqwest::Url> =
     once_cell::sync::Lazy::new(|| reqwest::Url::parse("https://howlongtobeat.com/").unwrap());
 
 #[derive(Debug)]
@@ -18,7 +17,7 @@ impl GameData {
         let name = name.as_ref();
         let res = reqwest::Client::new()
             .post(BASE_URL.join("search_results").unwrap())
-            .form(&[("queryString", name.as_ref()), ("t", "games")])
+            .form(&[("queryString", name), ("t", "games")])
             .send()
             .await?
             .error_for_status()?;

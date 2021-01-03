@@ -7,7 +7,7 @@ use std::fs::File;
 use std::io::BufReader;
 use tokio::try_join;
 
-const BASE_URL: once_cell::sync::Lazy<reqwest::Url> =
+static BASE_URL: once_cell::sync::Lazy<reqwest::Url> =
     once_cell::sync::Lazy::new(|| reqwest::Url::parse("https://store.steampowered.com/").unwrap());
 
 #[derive(Debug, Deserialize)]
@@ -25,7 +25,7 @@ static APP_MAP: once_cell::sync::Lazy<HashMap<String, Vec<u64>>> = once_cell::sy
     for app in apps {
         app_map
             .entry(app.name.trim().to_lowercase().to_string())
-            .or_insert_with(|| Vec::new())
+            .or_insert_with(Vec::new)
             .push(app.appid);
     }
     app_map
@@ -93,7 +93,7 @@ impl GameData {
             return Ok(Self {
                 name: app_data.name,
                 review_data,
-                metacritic_score: app_data.metacritic.and_then(|m| Some(m.score)),
+                metacritic_score: app_data.metacritic.map(|m| m.score),
             });
         }
 
