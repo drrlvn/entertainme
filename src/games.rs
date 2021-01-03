@@ -8,7 +8,6 @@ mod steam_api;
 
 #[derive(Debug)]
 pub struct GameData {
-    pub name: String,
     pub steam: Option<steam_api::GameData>,
     pub opencritic: Option<opencritic_api::GameData>,
     pub howlongtobeat: Option<howlongtobeat_api::GameData>,
@@ -26,7 +25,6 @@ impl GameData {
         .await;
 
         let mut game_data = GameData {
-            name: String::new(),
             steam: None,
             opencritic: None,
             howlongtobeat: None,
@@ -48,27 +46,29 @@ impl GameData {
             }
         }
 
-        game_data.name = if let Some(steam) = &game_data.steam {
-            steam.name.clone()
-        } else if let Some(opencritic) = &game_data.opencritic {
-            opencritic.name.clone()
-        } else if let Some(howlongtobeat) = &game_data.howlongtobeat {
-            howlongtobeat.name.clone()
-        } else {
-            names.0[0].clone()
-        };
-
         if game_data.steam.is_some() || game_data.opencritic.is_some() || game_data.howlongtobeat.is_some() {
             Ok(game_data)
         } else {
             Err(Error::NotFound)
         }
     }
+
+    fn name(&self) -> &str {
+        if let Some(steam) = &self.steam {
+            &steam.name
+        } else if let Some(opencritic) = &self.opencritic {
+            &opencritic.name
+        } else if let Some(howlongtobeat) = &self.howlongtobeat {
+            &howlongtobeat.name
+        } else {
+            ""
+        }
+    }
 }
 
 impl Display for GameData {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "{}", self.name)?;
+        writeln!(f, "{}", self.name())?;
         format_option(f, "Steam", &self.steam)?;
         format_option(f, "Opencritic", &self.opencritic)?;
         format_option(f, "How Long To Beat", &self.howlongtobeat)

@@ -39,8 +39,13 @@ impl FromStr for Names {
 async fn main() -> Result<()> {
     let opt = Opt::from_args();
     let games_data = games::get_data(&opt.names).await?;
+    let mut first = true;
     for game_data in games_data {
-        println!("{}", game_data);
+        if !first {
+            println!();
+        }
+        print!("{}", game_data);
+        first = false;
     }
     Ok(())
 }
