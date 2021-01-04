@@ -1,14 +1,21 @@
 use super::{Error, Result};
-use futures::future::TryFutureExt;
+use futures::{future::TryFutureExt, try_join};
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::fmt::Display;
-use std::fs::File;
-use std::io::BufReader;
-use tokio::try_join;
 
 static BASE_URL: once_cell::sync::Lazy<reqwest::Url> =
     once_cell::sync::Lazy::new(|| reqwest::Url::parse("https://store.steampowered.com/").unwrap());
+
+#[derive(Debug, Deserialize)]
+struct Response {
+    applist: AppList,
+}
+
+#[derive(Debug, Deserialize)]
+struct AppList {
+    apps: Vec<App>,
+}
 
 #[derive(Debug, Deserialize)]
 struct App {
@@ -16,11 +23,25 @@ struct App {
     name: String,
 }
 
-static APP_MAP: once_cell::sync::Lazy<HashMap<String, Vec<u64>>> = once_cell::sync::Lazy::new(|| {
-    let apps: Vec<App> = serde_json::from_reader(BufReader::new(
-        File::open(concat!(env!("OUT_DIR"), "/steam_app_map.json")).unwrap(),
-    ))
-    .unwrap();
+pub static APP_MAP: once_cell::sync::Lazy<HashMap<String, Vec<u64>>> = once_cell::sync::Lazy::new(|| {
+    let apps = std::thread::spawn(|| {
+        let rt = tokio::runtime::Runtime::new().expect("Couldn't initialize runtime");
+        rt.block_on(async {
+            reqwest::get("https://api.steampowered.com/ISteamApps/GetAppList/v2/")
+                .await
+                .expect("Couldn't fetch Steam app list")
+                .error_for_status()
+                .expect("Couldn't fetch Steam app list")
+                .json::<Response>()
+                .await
+                .expect("Couldn't deserialize Steam app list")
+                .applist
+                .apps
+        })
+    })
+    .join()
+    .expect("Failed joining thread");
+
     let mut app_map = HashMap::with_capacity(apps.len());
     for app in apps {
         app_map
