@@ -31,7 +31,7 @@ impl FromStr for Names {
     type Err = Error;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        Ok(Names(s.split('|').map(str::to_string).collect()))
+        Ok(Names(s.split('|').map(|s| s.to_lowercase().to_string()).collect()))
     }
 }
 
