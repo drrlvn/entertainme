@@ -1,7 +1,11 @@
 [package]
 name = "entertainme"
+description = "Helps you choose your next game."
 version = "0.1.0"
 authors = ["Dror Levin <dror@psybear.com>"]
+license = "GPL-3.0-or-later"
+repository = "https://github.com/drrlvn/entertainme"
+readme = "README.md"
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
