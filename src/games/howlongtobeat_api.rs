@@ -14,7 +14,9 @@ pub struct GameData {
 
 impl GameData {
     pub async fn get(name: String) -> Result<Self> {
-        let res = reqwest::Client::new()
+        let res = reqwest::ClientBuilder::new()
+            .user_agent("Mozilla/5.0")
+            .build()?
             .post(BASE_URL.join("search_results").unwrap())
             .form(&[("queryString", name.as_ref()), ("t", "games")])
             .send()
