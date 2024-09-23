@@ -38,6 +38,7 @@ impl GameData {
     pub async fn get(name: String) -> Result<Self> {
         let search_results: Vec<SearchResult> = reqwest::Client::new()
             .get(BASE_URL.join("game/search").unwrap())
+            .header(reqwest::header::REFERER, "https://opencritic.com/")
             .query(&[("criteria", &name)])
             .send()
             .await?
