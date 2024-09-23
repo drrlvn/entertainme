@@ -142,7 +142,6 @@ struct AppReviews {
 struct AppReviewSummary {
     review_score_desc: String,
     total_positive: u64,
-    total_negative: u64,
     total_reviews: u64,
 }
 
@@ -150,7 +149,6 @@ struct AppReviewSummary {
 pub struct ReviewData {
     pub description: String,
     pub positive: u64,
-    pub negative: u64,
     pub total: u64,
 }
 
@@ -170,7 +168,6 @@ impl ReviewData {
         Ok(Self {
             description: app_reviews.query_summary.review_score_desc,
             positive: app_reviews.query_summary.total_positive,
-            negative: app_reviews.query_summary.total_negative,
             total: app_reviews.query_summary.total_reviews,
         })
     }
