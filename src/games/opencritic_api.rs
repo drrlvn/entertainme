@@ -20,8 +20,8 @@ struct GameResponse {
     percent_recommended: f64,
     #[serde(rename = "topCriticScore")]
     top_critic_score: f64,
-    #[serde(rename = "averageScore")]
-    average_score: f64,
+    #[serde(rename = "medianScore")]
+    median_score: f64,
 }
 
 #[derive(Debug)]
@@ -51,17 +51,20 @@ impl GameData {
                 continue;
             }
 
-            let game_response: GameResponse = reqwest::get(
-                BASE_URL
-                    .join("game/")
-                    .unwrap()
-                    .join(&search_result.id.to_string())
-                    .unwrap(),
-            )
-            .await?
-            .error_for_status()?
-            .json()
-            .await?;
+            let game_response: GameResponse = reqwest::Client::new()
+                .get(
+                    BASE_URL
+                        .join("game/")
+                        .unwrap()
+                        .join(&search_result.id.to_string())
+                        .unwrap(),
+                )
+                .header(reqwest::header::REFERER, "https://opencritic.com/")
+                .send()
+                .await?
+                .error_for_status()?
+                .json()
+                .await?;
 
             return Ok(Self {
                 name: search_result.name,
@@ -69,7 +72,7 @@ impl GameData {
                 percentile: parse_response_num(game_response.percentile),
                 percent_recommended: parse_response_num(game_response.percent_recommended),
                 top_critic_score: parse_response_num(game_response.top_critic_score),
-                average_score: parse_response_num(game_response.average_score),
+                average_score: parse_response_num(game_response.median_score),
             });
         }
 
