@@ -3,9 +3,10 @@ use futures::{future::TryFutureExt, try_join};
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::fmt::Display;
+use std::sync::LazyLock;
 
-static BASE_URL: once_cell::sync::Lazy<reqwest::Url> =
-    once_cell::sync::Lazy::new(|| reqwest::Url::parse("https://store.steampowered.com/").unwrap());
+static BASE_URL: LazyLock<reqwest::Url> =
+    LazyLock::new(|| reqwest::Url::parse("https://store.steampowered.com/").unwrap());
 
 #[derive(Debug, Deserialize)]
 struct Response {
@@ -23,7 +24,7 @@ struct App {
     name: String,
 }
 
-pub static APP_MAP: once_cell::sync::Lazy<HashMap<String, Vec<u64>>> = once_cell::sync::Lazy::new(|| {
+pub static APP_MAP: LazyLock<HashMap<String, Vec<u64>>> = LazyLock::new(|| {
     let apps = std::thread::spawn(|| {
         let rt = tokio::runtime::Runtime::new().expect("Couldn't initialize runtime");
         rt.block_on(async {

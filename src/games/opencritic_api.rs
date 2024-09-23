@@ -1,9 +1,10 @@
 use super::{Error, Result};
 use serde::Deserialize;
 use std::fmt::Display;
+use std::sync::LazyLock;
 
-static BASE_URL: once_cell::sync::Lazy<reqwest::Url> =
-    once_cell::sync::Lazy::new(|| reqwest::Url::parse("https://api.opencritic.com/api/").unwrap());
+static BASE_URL: LazyLock<reqwest::Url> =
+    LazyLock::new(|| reqwest::Url::parse("https://api.opencritic.com/api/").unwrap());
 
 #[derive(Debug, Deserialize)]
 struct SearchResult {

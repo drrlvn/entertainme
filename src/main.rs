@@ -1,5 +1,5 @@
+use clap::Parser;
 use std::str::FromStr;
-use structopt::StructOpt;
 use thiserror::Error;
 
 mod games;
@@ -18,13 +18,13 @@ pub enum Error {
 
 type Result<T> = std::result::Result<T, Error>;
 
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 struct Opt {
-    #[structopt(required(true))]
+    #[arg(required(true))]
     names: Vec<Names>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Names(Vec<String>);
 
 impl FromStr for Names {
@@ -37,7 +37,7 @@ impl FromStr for Names {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let opt = Opt::from_args();
+    let opt = Opt::parse();
     let games_data = games::get_data(&opt.names).await?;
     let mut first = true;
     for game_data in games_data {
