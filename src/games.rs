@@ -84,6 +84,6 @@ fn parse_result<T>(result: Result<T>) -> Result<Option<T>> {
     }
 }
 
-pub async fn get_data(games_names: &Vec<super::Names>) -> Result<Vec<GameData>> {
-    Ok(try_join_all(games_names.into_iter().map(|game_names| GameData::get(&game_names))).await?)
+pub async fn get_data(games_names: &[super::Names]) -> Result<Vec<GameData>> {
+    try_join_all(games_names.iter().map(GameData::get)).await
 }

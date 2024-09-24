@@ -119,7 +119,7 @@ impl GameData {
             });
         }
 
-        return Err(Error::NotFound);
+        Err(Error::NotFound)
     }
 }
 
